@@ -30,6 +30,45 @@ os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
 os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
 
 
-st.set_page_config(page_title="Disruption Monitoring (Mirxes)", page_icon=":robot_face:")
+st.set_page_config(page_title="CargoLingo Advisor 🚢", page_icon=":robot_face:")
 
 
+st.markdown("<h1 style='text-align: center;'>CargoLingo Advisor 🚢</h1>", unsafe_allow_html=True)
+
+# Container box for Messages in
+# container for chat history
+response_container = st.container()
+# container for text box
+container = st.container()
+
+with container:
+    with st.form(key='my_form', clear_on_submit=True):
+        user_input = st.text_area("You:", key='input', height=100,placeholder ="I am travelling to Japan for a ski trip with my family next week.What kind of travel insurance coverage do we need?")
+        submit_button = st.form_submit_button(label='Send')
+
+    if submit_button and user_input:
+
+        with st.spinner(f"Running LLM on query: {user_input}"):
+            # Set 1 second timeout
+            st.write("Placeholder")
+            
+
+
+#         # Display the json output
+#         st.write(f'Results: {results}')
+#         st.write(f'Type of Results: {type(results)}')
+
+
+#         st.session_state['past'].append(user_input)
+#         st.session_state['generated'].append(results)
+#         st.session_state['model_name'].append(model_name)
+
+#         # from https://openai.com/pricing#language-models
+
+# if st.session_state['generated']:
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             message(st.session_state["generated"][i], key=str(i))
+#             st.write(
+#                 f"Model used: {st.session_state['model_name'][i]};")
