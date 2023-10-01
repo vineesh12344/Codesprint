@@ -5,3 +5,4 @@ gurobipy
 langchain==0.0.292
 FLAML
 OptiGuide
+tiktoken
