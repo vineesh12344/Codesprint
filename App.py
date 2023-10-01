@@ -38,17 +38,25 @@ st.markdown("<h1 style='text-align: center;'>CargoLingo Advisor 🚢</h1>", unsa
 
 
 @contextmanager
-def st_capture(output_func):
+def st_capture():
     with StringIO() as stdout, redirect_stdout(stdout):
         old_write = stdout.write
 
         def new_write(string):
             ret = old_write(string)
-            output_func(string)  # Pass the new output directly
+            # output_func(string)  # Pass the new output directly
+
+            with open("./logs/output.txt", "w") as f:
+                f.write(string)
+
             return ret
 
         stdout.write = new_write
         yield
+
+        # write stdout to file
+        with open("./logs/output.txt", "w") as f:
+            f.write(stdout.getvalue())
 
 # Container box for Messages in
 # container for chat history
@@ -64,14 +72,43 @@ with container:
     if submit_button and user_input:
 
         with st.spinner(f"Running Psa-LLM Agent {user_input}"):
-            # Set 1 second timeout
-            with st.expander("Show LLM Output"):
-                with st_capture(st.write):
-                    try:
-                        output = PsaOptiguide.ask(user_input)
-                    except Exception as e:
-                        st.error(f"Error: {e}")
-                        st.stop()
+            with st_capture():
+                try:
+                    output = PsaOptiguide.ask(user_input)
+                except Exception as e:
+                    st.error(f"Error: {e}")
+                    st.stop()
+
+            with open("./logs/output.txt", "r") as f:
+                output = f.read()
+                output = output.split("--------------------------------------------------------------------------------")
+
+
+                seen = []
+                for i in range(len(output) - 1):
+                    if(output[i] in seen):
+                        continue
+
+                    seen.append(output[i])
+                    if("to user" in output[i]):
+                        with st.expander(f"Final answer to human"):
+                            st.write(output[i])
+
+                        break
+                    elif("Gurobi" in output[i]):
+                        with st.expander(f"Gurobi optimizer output"):
+                            st.write(output[i])
+
+                    elif("safeguard" in output[i]):
+                        with st.expander(f"Checking if code is safe to run"):
+                            st.write(output[i])
+
+                    else:
+                        with st.expander(f"Intermediate thought {i + 1}"):
+                            st.write(output[i])
+
+
+            
 
 
 

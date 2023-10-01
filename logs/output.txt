@@ -1,0 +1,153 @@
+user (to OptiGuide Coffee Example):
+
+What if the warehouse capacity increases by 50%?
+
+--------------------------------------------------------------------------------
+OptiGuide Coffee Example (to writer):
+
+
+Answer Code:
+
+
+--------------------------------------------------------------------------------
+writer (to OptiGuide Coffee Example):
+
+```python
+# Updated capacity
+for s in capacity_in_supplier:
+    capacity_in_supplier[s] = int(capacity_in_supplier[s]*1.5)
+    
+# Update the supply constraints in the model
+for s in set(i[0] for i in shipping_cost_from_supplier_to_roastery.keys()):
+    model.remove(model.getConstrByName(f"supply_{s}"))
+    model.addConstr(
+        sum(x[i] for i in shipping_cost_from_supplier_to_roastery.keys()
+            if i[0] == s) <= capacity_in_supplier[s], f"supply_{s}")
+```
+
+--------------------------------------------------------------------------------
+OptiGuide Coffee Example (to safeguard):
+
+
+--- Code ---
+# Updated capacity
+for s in capacity_in_supplier:
+    capacity_in_supplier[s] = int(capacity_in_supplier[s]*1.5)
+    
+# Update the supply constraints in the model
+for s in set(i[0] for i in shipping_cost_from_supplier_to_roastery.keys()):
+    model.remove(model.getConstrByName(f"supply_{s}"))
+    model.addConstr(
+        sum(x[i] for i in shipping_cost_from_supplier_to_roastery.keys()
+            if i[0] == s) <= capacity_in_supplier[s], f"supply_{s}")
+
+--- One-Word Answer: SAFE or DANGER ---
+
+
+--------------------------------------------------------------------------------
+safeguard (to OptiGuide Coffee Example):
+
+SAFE
+
+--------------------------------------------------------------------------------
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (win64)
+
+CPU model: AMD Ryzen 7 4800H with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Optimize a model with 11 rows, 18 columns and 36 nonzeros
+Model fingerprint: 0xe2790f01
+Variable types: 0 continuous, 18 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+00, 1e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 2e+02]
+Found heuristic solution: objective 3280.0000000
+Presolve time: 0.00s
+Presolved: 11 rows, 18 columns, 36 nonzeros
+Variable types: 0 continuous, 18 integer (0 binary)
+Found heuristic solution: objective 3276.0000000
+
+Root relaxation: objective 2.470000e+03, 11 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    2470.0000000 2470.00000  0.00%     -    0s
+
+Explored 1 nodes (11 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 3: 2470 3276 3280 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.470000000000e+03, best bound 2.470000000000e+03, gap 0.0000%
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (win64)
+
+CPU model: AMD Ryzen 7 4800H with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Optimize a model with 11 rows, 18 columns and 36 nonzeros
+Model fingerprint: 0x5071b03a
+Variable types: 0 continuous, 18 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [2e+00, 1e+01]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [2e+01, 2e+02]
+
+Loaded MIP start from previous solve with objective 2470
+
+Presolve time: 0.00s
+Presolved: 11 rows, 18 columns, 36 nonzeros
+Variable types: 0 continuous, 18 integer (0 binary)
+Found heuristic solution: objective 2469.0000000
+
+Root relaxation: objective 2.445000e+03, 10 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+*    0     0               0    2445.0000000 2445.00000  0.00%     -    0s
+
+Explored 1 nodes (10 simplex iterations) in 0.02 seconds (0.00 work units)
+Thread count was 16 (of 16 available processors)
+
+Solution count 3: 2445 2469 2470 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 2.445000000000e+03, best bound 2.445000000000e+03, gap 0.0000%
+Sun Oct  1 15:16:16 2023
+Optimal cost: 2445.0
+Optimization problem solved. The objective value is: 2445.0
+OptiGuide Coffee Example (to writer):
+
+Here are the execution results: Optimization problem solved. The objective value is: 2445.0
+
+Can you organize these information to a human readable answer?
+Remember to compare the new results to the original results you obtained in the
+beginning.
+
+--- HUMAN READABLE ANSWER ---
+
+
+--------------------------------------------------------------------------------
+writer (to OptiGuide Coffee Example):
+
+Sure. 
+
+According to our initial solution, the optimal cost for the supply chain was 2470. After increasing the capacity of the warehouse by 50%, we found that the optimal cost dropped to 2445.
+
+This suggests that increasing warehouse capacity might allow us to fulfill more demands in a more cost-efficient way, possibly due to the ability to utilize more cost-effective supply routes that were previously limited by the warehouse capacity. They also facilitate greater supply flexibility. Hence, increasing warehouse capacity could potentially reduce overall supply chain costs.
+
+--------------------------------------------------------------------------------
+OptiGuide Coffee Example (to user):
+
+Sure. 
+
+According to our initial solution, the optimal cost for the supply chain was 2470. After increasing the capacity of the warehouse by 50%, we found that the optimal cost dropped to 2445.
+
+This suggests that increasing warehouse capacity might allow us to fulfill more demands in a more cost-efficient way, possibly due to the ability to utilize more cost-effective supply routes that were previously limited by the warehouse capacity. They also facilitate greater supply flexibility. Hence, increasing warehouse capacity could potentially reduce overall supply chain costs.
+
+--------------------------------------------------------------------------------
