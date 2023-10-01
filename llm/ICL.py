@@ -1,20 +1,20 @@
 # In-context learning examples.
 example_qa = """
 ----------
-Question: Why is it not recommended to use just one supplier for roastery 2?
+Question: Why is it not recommended to only use one warehouse for berth 1?
 Answer Code:
 ```python
-z = m.addVars(suppliers, vtype=GRB.BINARY, name="z")
-m.addConstr(sum(z[s] for s in suppliers) <= 1, "_")
-for s in suppliers:
-    m.addConstr(x[s,'roastery2'] <= capacity_in_supplier[s] * z[s], "_")
+z = m.addVars(warehouses, vtype=GRB.BINARY, name="z")
+m.addConstr(sum(z[w] for w in warehouses) <= 1, "_")
+for w in warehouses:
+    m.addConstr(shipping_costs['Berth1', w] <= warehouseCapacities[w] * z[w], "_")
 ```
 
 ----------
-Question: What if there's a 13% jump in the demand for light coffee at cafe1?
+Question: What if there's a 50% jump in the capacity of warehouse 1?
 Answer Code:
 ```python
-light_coffee_needed_for_cafe["cafe1"] = light_coffee_needed_for_cafe["cafe1"] * (1 + 13/100)
+warehouses["Warehouse1"] = warehouses["Warehouse1"] * (1 + 50/100)
 ```
 
 """

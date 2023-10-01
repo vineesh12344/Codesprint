@@ -1,102 +1,65 @@
-# Placeholder code for our own Gurobi implementation:
-# For now, we will use the Gurobi implementation Cofffe.py from the Gurobi website: https://www.gurobi.com/documentation/9.1/examples/coffee_py.html
-
+import pandas as pd
+import gurobipy as gp
+from gurobipy import GRB
 import time
-from gurobipy import GRB, Model
 
-# Example data
+berthCapacities = dict({"Berth1" : 10000,
+               "Berth2" : 20000,
+               "Berth3" : 1000,
+               "Berth4" : 40000})
 
-capacity_in_supplier = {'supplier1': 150, 'supplier2': 50, 'supplier3': 100}
+berths = berthCapacities.keys()
 
-shipping_cost_from_supplier_to_roastery = {
-    ('supplier1', 'roastery1'): 5,
-    ('supplier1', 'roastery2'): 4,
-    ('supplier2', 'roastery1'): 6,
-    ('supplier2', 'roastery2'): 3,
-    ('supplier3', 'roastery1'): 2,
-    ('supplier3', 'roastery2'): 7
-}
+warehouseCapacities = dict({"Warehouse1" : 10000,
+                    "Warehouse2" : 20000,
+                    "Warehouse3" : 10000,
+                    "Warehouse4" : 40000})
 
-roasting_cost_light = {'roastery1': 3, 'roastery2': 5}
+warehouses = warehouseCapacities.keys()
 
-roasting_cost_dark = {'roastery1': 5, 'roastery2': 6}
+shipping_costs= dict({("Berth1", "Warehouse1") : 10*1000/100,
+                    ("Berth1", "Warehouse2") : 20*1000/100,
+                    ("Berth1", "Warehouse3") : 30*1000/100,
+                    ("Berth1", "Warehouse4") : 100*1000/100,
+                    ("Berth2", "Warehouse1") : 10*1000/100,
+                    ("Berth2", "Warehouse2") : 60*1000/100,
+                    ("Berth2", "Warehouse3") : 40*1000/100,
+                    ("Berth2", "Warehouse4") : 70*1000/100,
+                    ("Berth3", "Warehouse1") : 20*1000/100,
+                    ("Berth3", "Warehouse2") : 40*1000/100,
+                    ("Berth3", "Warehouse3") : 110*1000/100,
+                    ("Berth3", "Warehouse4") : 10*1000/100,
+                    ("Berth4", "Warehouse1") : 10*1000/100,
+                    ("Berth4", "Warehouse2") : 120*1000/100,
+                    ("Berth4", "Warehouse3") : 50*1000/100,
+                    ("Berth4", "Warehouse4") : 10*1000/100})
 
-shipping_cost_from_roastery_to_cafe = {
-    ('roastery1', 'cafe1'): 5,
-    ('roastery1', 'cafe2'): 3,
-    ('roastery1', 'cafe3'): 6,
-    ('roastery2', 'cafe1'): 4,
-    ('roastery2', 'cafe2'): 5,
-    ('roastery2', 'cafe3'): 2
-}
+routes = shipping_costs.keys()
+cost = shipping_costs.values()
 
-light_coffee_needed_for_cafe = {'cafe1': 20, 'cafe2': 30, 'cafe3': 40}
-
-dark_coffee_needed_for_cafe = {'cafe1': 20, 'cafe2': 20, 'cafe3': 100}
-
-cafes = list(set(i[1] for i in shipping_cost_from_roastery_to_cafe.keys()))
-roasteries = list(
-    set(i[1] for i in shipping_cost_from_supplier_to_roastery.keys()))
-suppliers = list(
-    set(i[0] for i in shipping_cost_from_supplier_to_roastery.keys()))
-
-# Create a new model
-model = Model("coffee_distribution")
+## Model deployment
+model = gp.Model("Port Logistics")
 
 # OPTIGUIDE DATA CODE GOES HERE
 
-# Create variables
-x = model.addVars(shipping_cost_from_supplier_to_roastery.keys(),
-                  vtype=GRB.INTEGER,
-                  name="x")
-y_light = model.addVars(shipping_cost_from_roastery_to_cafe.keys(),
-                        vtype=GRB.INTEGER,
-                        name="y_light")
-y_dark = model.addVars(shipping_cost_from_roastery_to_cafe.keys(),
-                       vtype=GRB.INTEGER,
-                       name="y_dark")
 
-# Set objective
-model.setObjective(
-    sum(x[i] * shipping_cost_from_supplier_to_roastery[i]
-        for i in shipping_cost_from_supplier_to_roastery.keys()) +
-    sum(roasting_cost_light[r] * y_light[r, c] +
-        roasting_cost_dark[r] * y_dark[r, c]
-        for r, c in shipping_cost_from_roastery_to_cafe.keys()) + sum(
-            (y_light[j] + y_dark[j]) * shipping_cost_from_roastery_to_cafe[j]
-            for j in shipping_cost_from_roastery_to_cafe.keys()), GRB.MINIMIZE)
+trucks = model.addVars(routes, name="trucks", vtype=GRB.INTEGER)
 
-# Conservation of flow constraint
-for r in set(i[1] for i in shipping_cost_from_supplier_to_roastery.keys()):
-    model.addConstr(
-        sum(x[i] for i in shipping_cost_from_supplier_to_roastery.keys()
-            if i[1] == r) == sum(
-                y_light[j] + y_dark[j]
-                for j in shipping_cost_from_roastery_to_cafe.keys()
-                if j[0] == r), f"flow_{r}")
+## Objective function
+total_cost = gp.quicksum(trucks[i,j] * cost[i,j] for i,j in routes)
+containers_left = gp.quicksum(berthCapacities[b] - gp.quicksum(trucks[i,b] for i in berthCapacities.keys() if (i,b) in routes) for b in berthCapacities.keys())
+alpha = 0.5 # weight for the cost objective
+model.setObjective(alpha * total_cost + (1 - alpha) * containers_left, GRB.MINIMIZE)
 
-# Add supply constraints
-for s in set(i[0] for i in shipping_cost_from_supplier_to_roastery.keys()):
-    model.addConstr(
-        sum(x[i] for i in shipping_cost_from_supplier_to_roastery.keys()
-            if i[0] == s) <= capacity_in_supplier[s], f"supply_{s}")
-
-# Add demand constraints
-for c in set(i[1] for i in shipping_cost_from_roastery_to_cafe.keys()):
-    model.addConstr(
-        sum(y_light[j] for j in shipping_cost_from_roastery_to_cafe.keys()
-            if j[1] == c) >= light_coffee_needed_for_cafe[c],
-        f"light_demand_{c}")
-    model.addConstr(
-        sum(y_dark[j] for j in shipping_cost_from_roastery_to_cafe.keys()
-            if j[1] == c) >= dark_coffee_needed_for_cafe[c],
-        f"dark_demand_{c}")
-
-# Optimize model
+# berth capacity constraints
+ware_constrs = model.addConstrs(gp.quicksum(trucks.select(warehouse, '*')) <= warehouseCapacities[warehouse] for warehouse in warehouseCapacities.keys())
+berth_constrs = model.addConstrs(gp.quicksum(trucks.select('*', berth)) <= berthCapacities[berth] for berth in berthCapacities.keys())
 model.optimize()
+
 m = model
 
 # OPTIGUIDE CONSTRAINT CODE GOES HERE
+
 
 # Solve
 m.update()

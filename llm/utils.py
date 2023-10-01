@@ -81,10 +81,10 @@ class Visualizer:
    @classmethod
    def get_code(cls) -> str:
       """Returns the code for the visualizer"""
-      # Get the source code of the Visualizer class
-      code = inspect.getsource(cls)
+      # # Get the source code of the Visualizer class
+      # code = inspect.getsource(cls)
       # Get the source code of the plot_current_warehouse_capacity method
-      code += inspect.getsource(cls.plot_current_warehouse_capacity)
+      code = inspect.getsource(cls.plot_current_warehouse_capacity)
       return code
    
    @classmethod

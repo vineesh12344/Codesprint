@@ -115,6 +115,10 @@ visualizationClassificationPrompt = PromptTemplate(
     1. What-if questions on the impact of disruptions on port operations
     2. Requires re-optimization to get the best results using Gurobi
 
+
+    EXCEPTION QUESTION: if the question specifically mentions the following, it is not relevant:
+    1. current port operations which warehouse at maximum capacity --> Immediately reutrn FALSE for isRelevant
+
     Question:{question}\n\nFeedback:{feedback}\n
 
     TASK: Given youre Role, Classify if the question. Think through and give reasoning for your decision. Must Output boolean value for isDisruptionEvent.
@@ -122,5 +126,4 @@ visualizationClassificationPrompt = PromptTemplate(
     input_variables=["question","feedback"]
     
 )
-
 questionGurobiClassifier = create_structured_output_chain(output_schema=classifier_question_schema,llm = classifier_llm,prompt=visualizationClassificationPrompt)

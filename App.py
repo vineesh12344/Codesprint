@@ -6,6 +6,9 @@ import sys
 from contextlib import contextmanager, redirect_stdout
 from io import StringIO
 from llm.LLM import PsaOptiguide
+from llm.Agent_main import AgentMain
+from plotly import graph_objects as go
+
 # Get the absolute path to the directory containing this script (app.py)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -58,6 +61,20 @@ def st_capture():
         with open("./logs/output.txt", "w") as f:
             f.write(stdout.getvalue())
 
+@contextmanager
+def st_capture2(output_func):
+    with StringIO() as stdout, redirect_stdout(stdout):
+        old_write = stdout.write
+
+        def new_write(string):
+            ret = old_write(string)
+            output_func(string)  # Pass the new output directly
+            return ret
+
+        stdout.write = new_write
+        yield
+
+
 # Container box for Messages in
 # container for chat history
 response_container = st.container()
@@ -72,41 +89,57 @@ with container:
     if submit_button and user_input:
 
         with st.spinner(f"Running Psa-LLM Agent {user_input}"):
-            with st_capture():
-                try:
-                    output = PsaOptiguide.ask(user_input)
-                except Exception as e:
-                    st.error(f"Error: {e}")
-                    st.stop()
+            with st.expander("Show LLM Output",expanded=True):
+                with st_capture2(st.markdown):
+                    try:
+                        question_output = AgentMain.ask(user_input)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                        st.stop()
 
-            with open("./logs/output.txt", "r") as f:
-                output = f.read()
-                output = output.split("--------------------------------------------------------------------------------")
+            if isinstance(question_output, go.Figure):
+                # Return Streamlit plotly figure
+                st.plotly_chart(question_output)
+                        
+            elif question_output == user_input:
+                with st_capture():
+                    try:
+                        output = PsaOptiguide.ask(user_input)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                        st.stop()
+
+                with open("./logs/output.txt", "r") as f:
+                    output = f.read()
+                    output = output.split("--------------------------------------------------------------------------------")
 
 
-                seen = []
-                for i in range(len(output) - 1):
-                    if(output[i] in seen):
-                        continue
+                    seen = []
+                    for i in range(len(output) - 1):
+                        if(output[i] in seen):
+                            continue
 
-                    seen.append(output[i])
-                    if("to user" in output[i]):
-                        with st.expander(f"Final answer to human"):
-                            st.write(output[i])
+                        seen.append(output[i])
+                        if("to user" in output[i]):
+                            with st.expander(f"Final answer to human"):
+                                st.write(output[i])
 
-                        break
-                    elif("Gurobi" in output[i]):
-                        with st.expander(f"Gurobi optimizer output"):
-                            st.write(output[i])
+                            break
+                        elif("Gurobi" in output[i]):
+                            with st.expander(f"Gurobi optimizer output"):
+                                st.write(output[i])
 
-                    elif("safeguard" in output[i]):
-                        with st.expander(f"Checking if code is safe to run"):
-                            st.write(output[i])
+                        elif("safeguard" in output[i]):
+                            with st.expander(f"Checking if code is safe to run"):
+                                st.write(output[i])
 
-                    else:
-                        with st.expander(f"Intermediate thought {i + 1}"):
-                            st.write(output[i])
+                        else:
+                            with st.expander(f"Intermediate thought {i + 1}"):
+                                st.write(output[i])
 
+            else:
+                """Means its non relevant question"""
+                st.write(f"**{question_output}**")
 
             
 

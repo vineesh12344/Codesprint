@@ -156,15 +156,18 @@ class AgentMain:
             print(f''':green[Querying Database...]''')
             # Set timeout 2 seconds
             time.sleep(2)
-            print(f''':green[Retrived Data: showing first 5rows:]\n\n ```py{Visualizer.getWarehouseData().head(5)}```''')
+            print(f''':green[Retrived Data: showing first 5rows:]\n\n ```python
+                  {Visualizer.getWarehouseData().head()}```''')
             print(f''':blue[Generating Code for Visualization...]''')
             time.sleep(2)
             print(f''':green[Code Generated:]\n\n ```py{Visualizer.get_code()}```''')
             print(f''':green[Sucessfully Generated plot]''')
             return Visualizer.plot_current_warehouse_capacity()
         
+        else:
         # This means is a gurobi question
-        print(f':blue[GurobiQuestion]')
+            print(f':blue[Running LLM Agent (Will take 30~ sec)...]')
+            return question
     
     
     @staticmethod
@@ -183,7 +186,7 @@ class AgentMain:
         """
         try:
             # Get number of tokens for the article
-            result = AgentMain.questionClassifierChain.run(question, feedback="")
+            result = AgentMain.questionClassifierChain.run(question=question, feedback="")
 
             # Validate the output
             validation_results = outputValidator.validate(AgentMain.questionClassifierChain, result)
@@ -192,6 +195,7 @@ class AgentMain:
                 # Re-run the validation error as feedback for the LLMChain
                 result = AgentMain.questionClassifierChain.run(question=question, feedback=validation_results[1])
 
+            return result
         except Exception as e:
             raise Exception(f"Error: Binary Classification Failed -> {e}") from e
     
@@ -200,7 +204,7 @@ class AgentMain:
         """Classifies if the given article require use of gurobi optimization or not"""
         try:
             # Get number of tokens for the article
-            result = AgentMain.questionGurobiClassifierChain.run(question, feedback="")
+            result = AgentMain.questionGurobiClassifierChain.run(question = question, feedback="")
 
             # Validate the output
             validation_results = outputValidator.validate(AgentMain.questionGurobiClassifierChain, result)
@@ -209,6 +213,7 @@ class AgentMain:
                 # Re-run the validation error as feedback for the LLMChain
                 result = AgentMain.questionGurobiClassifierChain.run(question=question, feedback=validation_results[1])
 
+            return result
         except Exception as e:
             raise Exception(f"Error: Binary Classification Failed -> {e}") from e        
 
