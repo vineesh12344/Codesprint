@@ -45,7 +45,6 @@ config_list = autogen.config_list_from_json(
         }
     }
 )
-
 agent = OptiGuideAgent(name="OptiGuide Coffee Example",
                   source_code=code,
                    debug_times=1,

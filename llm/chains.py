@@ -63,37 +63,64 @@ os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
 
 classifier_llm = ChatOpenAI(model_name="gpt-3.5-turbo-0613", temperature=1)
 classifier_article_schema = {
-    "name": "binary_classifier_article_schema",
-    "description": "Binary Classifier Schema for Article, is a disruption event or not",
+    "name": "binary_classifier_schema",
+    "description": "Binary Classifier for is relevant question",
     "type": "object",
     "properties": {
-      "isDisruptionEvent": {
+      "isRelevant": {
         "type": "boolean"
-      },
-      "disruptionType":{
-        "type": "string",
-        "description": "Type of disruption event. Must be one of the example the Full list given in conditions"
       },
       "Reason": {
         "type": "string",
         "description": "Reason for your decision"
       }
     },
-    "required": ["isDisruptionEvent","disruptionType","Reason"]
+    "required": ["isRelevant","Reason"]
   }
 
 classifierprompt = PromptTemplate(
-    template = """Role:You are a Binary Classifier,your goal is to classify if the given news article is a vaild disruption event article or not.
-    Conditions:
-    1. A disruption event can be defined as "An event that potentially impacts the supply chain and have a vaild disruption type".
-    Full List of possible disruption types: a) Airport Disruption b) Bankruptcy c) Business Spin-off d) Business Sale e) Chemical Spill f) Corruption g) Company Split h) Cyber Attack i) FDA/EMA/OSHA Action j) Factory Fire k) Fine l) Geopolitical m) Leadership Transition n) Legal Action o) Merger & Acquisition p) Port Disruption q) Protest/Riot r) Supply Shortage a) Earthquake b) Extreme Weather c) Flood d) Hurricane e) Tornado f) Volcano g) Human Health h) Power Outage.
-    2. The disruption event the news article is reporting, must be a 'live' event, meaning it is currently happening. Not an article reporting on a past event.
+    template = """Role:You are a Binary Classifier,your goal is to classify if the given Question is relevant to any following context:
+    1. Questions relating to the port operations of PSA, including warehouses,berths, and other port facilities.
+    2. Live querys on visualzation of current port operations, including the number of ships, capacity, and other metrics.
+    3. What-if questions on the impact of disruptions on port operations
 
-    Article Title:{articleTitle}\n{articleText}\nEnd of article\n\nFeedback:{feedback}\n
+    Question:{question}\n\nFeedback:{feedback}\n
 
-    TASK: Given youre Role and the Conditions, Classify if the given news article is a vaild disruption event article or not.A vaild disruption event article is classified as "An event that potentially impacts the supply chain and have a vaild disruption type",  Select the disruption type only based on the given full list of possible disruption types. Think through and give reasoning for your decision. Must Output boolean value for isDisruptionEvent.
+    TASK: Given youre Role, Classify if the question. Think through and give reasoning for your decision. Must Output boolean value for isDisruptionEvent.
     """,
-    input_variables=["articleTitle","articleText","feedback"]
+    input_variables=["question","feedback"]
+
 )
 
-articleClassifier = create_structured_output_chain(output_schema=classifier_article_schema,llm = classifier_llm,prompt=classifierprompt)
+questionClassifier = create_structured_output_chain(output_schema=classifier_article_schema,llm = classifier_llm,prompt=classifierprompt)
+
+classifier_question_schema = {
+    "name": "binary_classifier_schema",
+    "description": "Binary Classifier for is relevant question",
+    "type": "object",
+    "properties": {
+      "isRelevant": {
+        "type": "boolean"
+      },
+      "Reason": {
+        "type": "string",
+        "description": "Reason for your decision"
+      }
+    },
+    "required": ["isRelevant","Reason"]
+  }
+
+visualizationClassificationPrompt = PromptTemplate(
+    template = """Role:You are a Binary Classifier,your goal is to classify if the given Question is relevant to any following context:
+    1. What-if questions on the impact of disruptions on port operations
+    2. Requires re-optimization to get the best results using Gurobi
+
+    Question:{question}\n\nFeedback:{feedback}\n
+
+    TASK: Given youre Role, Classify if the question. Think through and give reasoning for your decision. Must Output boolean value for isDisruptionEvent.
+    """,
+    input_variables=["question","feedback"]
+    
+)
+
+questionGurobiClassifier = create_structured_output_chain(output_schema=classifier_question_schema,llm = classifier_llm,prompt=visualizationClassificationPrompt)
