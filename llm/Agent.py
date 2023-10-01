@@ -3,6 +3,7 @@ import re
 import requests  # for loading the example source code
 import openai
 import os
+import streamlit as st
 
 # import flaml and autogen
 from flaml import autogen
@@ -15,8 +16,10 @@ path_to_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(path_to_root, ".env"))
 
 # Set the OpenAI API key
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+
 
 def get_code(fileName:str) -> str:
     """Gets the code for the PSA Port Operations use case from src/psa_gurobi.py
