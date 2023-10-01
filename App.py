@@ -131,7 +131,7 @@ with container:
 
                         elif("safeguard" in output[i]):
                             with st.expander(f"Checking if code is safe to run"):
-                                st.write(output[i])
+                                st.markdown(f'''```python {output[i]} ''')
 
                         else:
                             with st.expander(f"Intermediate thought {i + 1}"):

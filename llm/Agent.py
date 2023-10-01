@@ -8,6 +8,7 @@ import os
 from flaml import autogen
 from flaml.autogen.agentchat import Agent, UserProxyAgent
 from optiguide.optiguide import OptiGuideAgent # This one we might need to change things up 
+from llm.ICL import example_qa
 
 from dotenv import load_dotenv
 path_to_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,10 +46,10 @@ config_list = autogen.config_list_from_json(
         }
     }
 )
-agent = OptiGuideAgent(name="OptiGuide Coffee Example",
+agent = OptiGuideAgent(name="CargoLingo Advisor Agent",
                   source_code=code,
                    debug_times=1,
-                  example_qa="",
+                  example_qa=example_qa,
                 llm_config={
         "request_timeout": 600,
         "seed": 42,

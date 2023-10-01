@@ -1,129 +1,78 @@
-user (to OptiGuide Coffee Example):
+user (to CargoLingo Advisor Agent):
 
-What is the impact of supplier1 being able to supply only half the quantity at present?
+What if there's a 50% jump in the capacity of warehouse 1?
 
 --------------------------------------------------------------------------------
-OptiGuide Coffee Example (to writer):
+CargoLingo Advisor Agent (to writer):
 
 
 Answer Code:
 
 
 --------------------------------------------------------------------------------
-writer (to OptiGuide Coffee Example):
+writer (to CargoLingo Advisor Agent):
 
 ```python
-# Assuming that supplier1 corresponds to "Berth1" in our case
-# As we know that supplier1 can supply only half the quantity at present,
-# we have to update the capacity of Berth1 to half of its original capacity.
-
-# Update the capacity of Berth1
-berthCapacities["Berth1"] = berthCapacities["Berth1"]/2
-
-# Update the model after changing the capacity
-berth_constrs["Berth1"].RHS = berthCapacities["Berth1"]
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * (1 + 50/100)
 ```
 
-This code sets the capacity of Berth1 to half of its original value. `berth_constrs` contains the constraint objects for each berth's capacity in the model. We update the Right Hand Side (RHS) of the berth constraint for Berth1 to reflect the new capacity. After running the optimization with the updated constraints and capacities, you will see the impact on the optimal solution and objective value.
-
 --------------------------------------------------------------------------------
-OptiGuide Coffee Example (to safeguard):
+CargoLingo Advisor Agent (to safeguard):
 
 
 --- Code ---
-# Assuming that supplier1 corresponds to "Berth1" in our case
-# As we know that supplier1 can supply only half the quantity at present,
-# we have to update the capacity of Berth1 to half of its original capacity.
-
-# Update the capacity of Berth1
-berthCapacities["Berth1"] = berthCapacities["Berth1"]/2
-
-# Update the model after changing the capacity
-berth_constrs["Berth1"].RHS = berthCapacities["Berth1"]
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * (1 + 50/100)
 
 --- One-Word Answer: SAFE or DANGER ---
 
 
 --------------------------------------------------------------------------------
-safeguard (to OptiGuide Coffee Example):
+safeguard (to CargoLingo Advisor Agent):
 
 SAFE
 
 --------------------------------------------------------------------------------
-name 'berth_constrs' is not defined
-OptiGuide Coffee Example (to writer):
+'dict_values' object is not subscriptable
+CargoLingo Advisor Agent (to writer):
 
 
 
-While running the code you suggested, I encountered the <class 'NameError'>:
+While running the code you suggested, I encountered the <class 'TypeError'>:
 --- ERROR MESSAGE ---
-name 'berth_constrs' is not defined
+'dict_values' object is not subscriptable
 
 Please try to resolve this bug, and rewrite the code snippet.
 --- NEW CODE ---
 
 
 --------------------------------------------------------------------------------
-writer (to OptiGuide Coffee Example):
+writer (to CargoLingo Advisor Agent):
 
-I'm sorry for the confusion. `berth_constrs` won't be accessible outside the function where it was defined. To properly modify the berth capacity, you should redefine and re-optimize the entire model. Here's the code:
+You encountered an error because of trying to access dictionary values in a wrong way. Corrected code is as follow:
 
 ```python
-# Redefine the berth capacity dict
-berthCapacities = dict({
-               "Berth1" : 10000/2, # assuming that Berth1 is supplier1, its capacity is halved
-               "Berth2" : 20000,
-               "Berth3" : 1000,
-               "Berth4" : 40000})
-
-# Clear the current model 
-model.reset()
-
-# Get the new berth constraints
-berth_constrs = model.addConstrs(gp.quicksum(trucks.select('*', berth)) <= berthCapacities[berth] for berth in berthCapacities.keys())
-
-model.update()
-model.optimize()
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
 ```
-
-In this code snippet:
-- We first redefine the `berthCapacities` dict to reflect the reduced capacity of "Berth1" (assuming this is "supplier1"). 
-- We then reset the model to clear the current solution. 
-- Then, we add the berth capacity constraints to the model, this time with the updated capacities. 
-- Finally, we update and re-optimize the model to find the new optimal solution.
+This will increase the capacity of Warehouse1 by 50%. What will happen next is that, the model will take into account this new capacity when trying to find the optimal soluion. Therefore, it may affect the chosen routes, the whole costs and the distribution of the goods.
 
 --------------------------------------------------------------------------------
-OptiGuide Coffee Example (to safeguard):
+CargoLingo Advisor Agent (to safeguard):
 
 
 --- Code ---
-# Redefine the berth capacity dict
-berthCapacities = dict({
-               "Berth1" : 10000/2, # assuming that Berth1 is supplier1, its capacity is halved
-               "Berth2" : 20000,
-               "Berth3" : 1000,
-               "Berth4" : 40000})
-
-# Clear the current model 
-model.reset()
-
-# Get the new berth constraints
-berth_constrs = model.addConstrs(gp.quicksum(trucks.select('*', berth)) <= berthCapacities[berth] for berth in berthCapacities.keys())
-
-model.update()
-model.optimize()
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
 
 --- One-Word Answer: SAFE or DANGER ---
 
 
 --------------------------------------------------------------------------------
-safeguard (to OptiGuide Coffee Example):
+safeguard (to CargoLingo Advisor Agent):
 
 SAFE
 
 --------------------------------------------------------------------------------
 'dict_values' object is not subscriptable
-OptiGuide Coffee Example (to user):
+CargoLingo Advisor Agent (to user):
 
 Sorry. I cannot answer your question.
 
