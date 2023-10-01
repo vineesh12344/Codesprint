@@ -14,6 +14,8 @@ from flaml import autogen
 from flaml.autogen.agentchat import Agent, UserProxyAgent
 from optiguide.optiguide import OptiGuideAgent
 
+import langchain
+
 autogen.oai.ChatCompletion.start_logging()
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
