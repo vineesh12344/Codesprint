@@ -14,7 +14,7 @@ for w in warehouses:
 Question: What if there's a 50% jump in the capacity of warehouse 1?
 Answer Code:
 ```python
-warehouses["Warehouse1"] = warehouses["Warehouse1"] * (1 + 50/100)
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * (1 + 50/100)
 ```
 
 """

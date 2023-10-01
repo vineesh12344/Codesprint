@@ -13,7 +13,8 @@ Answer Code:
 writer (to CargoLingo Advisor Agent):
 
 ```python
-warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * (1 + 50/100)
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
+ware_constrs["Warehouse1"].setAttr("RHS", warehouseCapacities["Warehouse1"])
 ```
 
 --------------------------------------------------------------------------------
@@ -21,7 +22,8 @@ CargoLingo Advisor Agent (to safeguard):
 
 
 --- Code ---
-warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * (1 + 50/100)
+warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
+ware_constrs["Warehouse1"].setAttr("RHS", warehouseCapacities["Warehouse1"])
 
 --- One-Word Answer: SAFE or DANGER ---
 
@@ -32,14 +34,14 @@ safeguard (to CargoLingo Advisor Agent):
 SAFE
 
 --------------------------------------------------------------------------------
-'dict_values' object is not subscriptable
+name 'ware_constrs' is not defined
 CargoLingo Advisor Agent (to writer):
 
 
 
-While running the code you suggested, I encountered the <class 'TypeError'>:
+While running the code you suggested, I encountered the <class 'NameError'>:
 --- ERROR MESSAGE ---
-'dict_values' object is not subscriptable
+name 'ware_constrs' is not defined
 
 Please try to resolve this bug, and rewrite the code snippet.
 --- NEW CODE ---
@@ -48,19 +50,59 @@ Please try to resolve this bug, and rewrite the code snippet.
 --------------------------------------------------------------------------------
 writer (to CargoLingo Advisor Agent):
 
-You encountered an error because of trying to access dictionary values in a wrong way. Corrected code is as follow:
+Apologies for the confusion caused. 
+
+In this correction, we will update the capacity of "Warehouse1" and re-deploy the model. Below is the corrected code snippet:
 
 ```python
+# update warehouse capacity
 warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
+
+# Model re-deployment
+model = gp.Model("Port Logistics")
+trucks = model.addVars(routes, name="trucks", vtype=GRB.INTEGER)
+
+# Objective function
+total_cost = gp.quicksum(trucks[i,j] * shipping_costs[(i,j)] for i,j in routes)
+containers_left = gp.quicksum(berthCapacities[b] - gp.quicksum(trucks[i,b] for i in berthCapacities.keys() if (i,b) in routes) for b in berthCapacities.keys())
+alpha = 0.5 # weight for the cost objective
+model.setObjective(alpha * total_cost + (1 - alpha) * containers_left, GRB.MINIMIZE)
+
+# deploy constraints
+ware_constrs = model.addConstrs(gp.quicksum(trucks.select(warehouse, '*')) <= warehouseCapacities[warehouse] for warehouse in warehouseCapacities.keys())
+berth_constrs = model.addConstrs(gp.quicksum(trucks.select('*', berth)) <= berthCapacities[berth] for berth in berthCapacities.keys())
+
+# Solve
+model.optimize()
 ```
-This will increase the capacity of Warehouse1 by 50%. What will happen next is that, the model will take into account this new capacity when trying to find the optimal soluion. Therefore, it may affect the chosen routes, the whole costs and the distribution of the goods.
+
+In this code, we first update the capacity of `Warehouse1`. Then, we re-deploy the model by creating a new `gurobipy` model instance and re-adding the variables, objective function, and constraints to the model. Finally, we optimize the model to find the new solution with the updated warehouse capacity.
+
 
 --------------------------------------------------------------------------------
 CargoLingo Advisor Agent (to safeguard):
 
 
 --- Code ---
+# update warehouse capacity
 warehouseCapacities["Warehouse1"] = warehouseCapacities["Warehouse1"] * 1.5
+
+# Model re-deployment
+model = gp.Model("Port Logistics")
+trucks = model.addVars(routes, name="trucks", vtype=GRB.INTEGER)
+
+# Objective function
+total_cost = gp.quicksum(trucks[i,j] * shipping_costs[(i,j)] for i,j in routes)
+containers_left = gp.quicksum(berthCapacities[b] - gp.quicksum(trucks[i,b] for i in berthCapacities.keys() if (i,b) in routes) for b in berthCapacities.keys())
+alpha = 0.5 # weight for the cost objective
+model.setObjective(alpha * total_cost + (1 - alpha) * containers_left, GRB.MINIMIZE)
+
+# deploy constraints
+ware_constrs = model.addConstrs(gp.quicksum(trucks.select(warehouse, '*')) <= warehouseCapacities[warehouse] for warehouse in warehouseCapacities.keys())
+berth_constrs = model.addConstrs(gp.quicksum(trucks.select('*', berth)) <= berthCapacities[berth] for berth in berthCapacities.keys())
+
+# Solve
+model.optimize()
 
 --- One-Word Answer: SAFE or DANGER ---
 
@@ -71,9 +113,107 @@ safeguard (to CargoLingo Advisor Agent):
 SAFE
 
 --------------------------------------------------------------------------------
-'dict_values' object is not subscriptable
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (win64)
+
+CPU model: AMD Ryzen 7 4800H with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Optimize a model with 8 rows, 16 columns and 0 nonzeros
+Model fingerprint: 0x2205422d
+Variable types: 0 continuous, 16 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [5e+01, 6e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 4e+04]
+Found heuristic solution: objective 35500.000000
+
+Explored 0 nodes (0 simplex iterations) in 0.00 seconds (0.00 work units)
+Thread count was 1 (of 16 available processors)
+
+Solution count 1: 35500 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.550000000000e+04, best bound 3.550000000000e+04, gap 0.0000%
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (win64)
+
+CPU model: AMD Ryzen 7 4800H with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Optimize a model with 8 rows, 16 columns and 0 nonzeros
+Model fingerprint: 0x8ea67126
+Variable types: 0 continuous, 16 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [5e+01, 6e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 4e+04]
+Found heuristic solution: objective 35500.000000
+
+Explored 0 nodes (0 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 1 (of 16 available processors)
+
+Solution count 1: 35500 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.550000000000e+04, best bound 3.550000000000e+04, gap 0.0000%
+Gurobi Optimizer version 10.0.3 build v10.0.3rc0 (win64)
+
+CPU model: AMD Ryzen 7 4800H with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 16 logical processors, using up to 16 threads
+
+Optimize a model with 8 rows, 16 columns and 0 nonzeros
+Model fingerprint: 0x8ea67126
+Variable types: 0 continuous, 16 integer (0 binary)
+Coefficient statistics:
+  Matrix range     [0e+00, 0e+00]
+  Objective range  [5e+01, 6e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+03, 4e+04]
+
+
+
+Explored 0 nodes (0 simplex iterations) in 0.01 seconds (0.00 work units)
+Thread count was 1 (of 16 available processors)
+
+Solution count 1: 35500 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 3.550000000000e+04, best bound 3.550000000000e+04, gap 0.0000%
+Sun Oct  1 22:39:20 2023
+Optimal cost: 35500.0
+Optimization problem solved. The objective value is: 35500.0
+CargoLingo Advisor Agent (to writer):
+
+Here are the execution results: Optimization problem solved. The objective value is: 35500.0
+
+Can you organize these information to a human readable answer?
+Remember to compare the new results to the original results you obtained in the
+beginning.
+
+--- HUMAN READABLE ANSWER ---
+
+
+--------------------------------------------------------------------------------
+writer (to CargoLingo Advisor Agent):
+
+Absolutely, here's the re-evaluation:
+
+As a reaction to a 50% increase in the capacity of Warehouse 1, the model was re-computed and solved. The original objective value before the change was 35500. However, after the capacity adjustment for Warehouse 1, the objective value didn't change and remained at 35500.
+
+This implies that the increased capacity of Warehouse 1 didn't make a significant influence on the total cost. The reason could be tied to various factors including shipping costs, the capacities of other warehouses, or the distribution of shipping routes. 
+
+To gain a deeper understanding of the supply chain dynamics, one might consider performing a sensitivity analysis, altering other warehouse capacities, or modifying the shipping costs.
+
+--------------------------------------------------------------------------------
 CargoLingo Advisor Agent (to user):
 
-Sorry. I cannot answer your question.
+Absolutely, here's the re-evaluation:
+
+As a reaction to a 50% increase in the capacity of Warehouse 1, the model was re-computed and solved. The original objective value before the change was 35500. However, after the capacity adjustment for Warehouse 1, the objective value didn't change and remained at 35500.
+
+This implies that the increased capacity of Warehouse 1 didn't make a significant influence on the total cost. The reason could be tied to various factors including shipping costs, the capacities of other warehouses, or the distribution of shipping routes. 
+
+To gain a deeper understanding of the supply chain dynamics, one might consider performing a sensitivity analysis, altering other warehouse capacities, or modifying the shipping costs.
 
 --------------------------------------------------------------------------------

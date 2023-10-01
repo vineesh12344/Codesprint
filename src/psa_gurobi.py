@@ -1,4 +1,3 @@
-import pandas as pd
 import gurobipy as gp
 from gurobipy import GRB
 import time
@@ -8,14 +7,14 @@ berthCapacities = dict({"Berth1" : 10000,
                "Berth3" : 1000,
                "Berth4" : 40000})
 
-berths = berthCapacities.keys()
+berths = list(berthCapacities.keys())
 
 warehouseCapacities = dict({"Warehouse1" : 10000,
                     "Warehouse2" : 20000,
                     "Warehouse3" : 10000,
                     "Warehouse4" : 40000})
 
-warehouses = warehouseCapacities.keys()
+warehouses = list(warehouseCapacities.keys())
 
 shipping_costs= dict({("Berth1", "Warehouse1") : 10*1000/100,
                     ("Berth1", "Warehouse2") : 20*1000/100,
@@ -34,8 +33,8 @@ shipping_costs= dict({("Berth1", "Warehouse1") : 10*1000/100,
                     ("Berth4", "Warehouse3") : 50*1000/100,
                     ("Berth4", "Warehouse4") : 10*1000/100})
 
-routes = shipping_costs.keys()
-cost = shipping_costs.values()
+routes = list(shipping_costs.keys())
+cost = list(shipping_costs.values())
 
 ## Model deployment
 model = gp.Model("Port Logistics")
@@ -46,7 +45,7 @@ model = gp.Model("Port Logistics")
 trucks = model.addVars(routes, name="trucks", vtype=GRB.INTEGER)
 
 ## Objective function
-total_cost = gp.quicksum(trucks[i,j] * cost[i,j] for i,j in routes)
+total_cost = gp.quicksum(trucks[i,j] * shipping_costs[(i,j)] for i,j in routes)
 containers_left = gp.quicksum(berthCapacities[b] - gp.quicksum(trucks[i,b] for i in berthCapacities.keys() if (i,b) in routes) for b in berthCapacities.keys())
 alpha = 0.5 # weight for the cost objective
 model.setObjective(alpha * total_cost + (1 - alpha) * containers_left, GRB.MINIMIZE)
