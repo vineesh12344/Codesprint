@@ -29,16 +29,20 @@ LANGCHAIN_PROJECT = st.secrets["LANGCHAIN_PROJECT"]
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
-# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-# os.environ["LANGCHAIN_TRACING_V2"] = LANGCHAIN_TRACING_V2
-# os.environ["LANGCHAIN_ENDPOINT"] = LANGCHAIN_ENDPOINT
-# os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
-# os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+os.environ["LANGCHAIN_TRACING_V2"] = LANGCHAIN_TRACING_V2
+os.environ["LANGCHAIN_ENDPOINT"] = LANGCHAIN_ENDPOINT
+os.environ["LANGCHAIN_API_KEY"] = LANGCHAIN_API_KEY
+os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
 
 
 st.set_page_config(page_title="CargoLingo Advisor 🚢", page_icon=":robot_face:")
 st.markdown("<h1 style='text-align: center;'>CargoLingo Advisor 🚢</h1>", unsafe_allow_html=True)
+# 
 
+st.markdown("""🌟Tool advicing supply chain business planners, insights to what-if scenarios, allowing more autonomy and may substantially reduce the engineering
+on-call burden""")
+st.markdown("""Leaveraging on power of Large-Language-Models (LLM) Agents to Act as a wrapper around complicated Optimization Stuctures and database of your supplu chain""")
 
 @contextmanager
 def st_capture():
