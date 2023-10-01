@@ -12,3 +12,8 @@ pip install -r requirements.txt
 Install streamlit secrets
 
 1. Create Folder .streamlit in root folder
+
+
+# Some werid todo list:
+
+What E

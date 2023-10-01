@@ -65,13 +65,14 @@ with container:
 
         with st.spinner(f"Running Psa-LLM Agent {user_input}"):
             # Set 1 second timeout
-            with st_capture(st.markdown):
-                try:
-                    output = PsaOptiguide.ask(user_input)
-                except Exception as e:
-                    st.error(f"Error: {e}")
-                    st.stop()
-            
+            with st.expander("Show LLM Output"):
+                with st_capture(st.write):
+                    try:
+                        output = PsaOptiguide.ask(user_input)
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+                        st.stop()
+
 
 
 #         # Display the json output
