@@ -40,9 +40,8 @@ st.set_page_config(page_title="CargoLingo Advisor 🚢", page_icon=":robot_face:
 st.markdown("<h1 style='text-align: center;'>CargoLingo Advisor 🚢</h1>", unsafe_allow_html=True)
 # 
 
-st.markdown("""🌟Tool advicing supply chain business planners, insights to what-if scenarios, allowing more autonomy and may substantially reduce the engineering
-on-call burden""")
-st.markdown("""Leaveraging on power of Large-Language-Models (LLM) Agents to Act as a wrapper around complicated Optimization Stuctures and database of your supplu chain""")
+st.subheader("""🌟GPT Powered Tool: advicing business planners, insights to what-if scenarios, allowing more autonomy and may substantially reduce the engineering on-call burden""")
+st.markdown("""Leaveraging on power of Large-Language-Models (LLM) Agents to Act as a wrapper around your Tech Infrastucture E.g complicated Optimization Stuctures and database of your port supply chain""")
 
 @contextmanager
 def st_capture():

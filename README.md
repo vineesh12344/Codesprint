@@ -1,19 +1,14 @@
 # Codesprint
 
-## Commands to run
+## Video Demo
 
-Setup virtual environment and install dependencies
-```
-py -m venv env
-env\Scripts\activate
-pip install -r requirements.txt
-```
+[![Video Demo](https://img.youtube.com/vi/_-zu0b5g4vQ/0.jpg)](https://youtu.be/5z0uDr3kPW4)
 
-Install streamlit secrets
+## Try it Out!
 
-1. Create Folder .streamlit in root folder
+https://cargolingoadvisor.streamlit.app/
 
+## What it does
+🌟GPT Powered Tool: advicing business planners, insights to what-if scenarios, allowing more autonomy and may substantially reduce the engineering on-call burden
 
-# Some werid todo list:
-
-What E
+Leaveraging on power of Large-Language-Models (LLM) Agents to Act as a wrapper around your Tech Infrastucture E.g complicated Optimization Stuctures and database of your port supply chain
