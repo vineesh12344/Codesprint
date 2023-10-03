@@ -43,6 +43,7 @@ st.markdown("<h1 style='text-align: center;'>CargoLingo Advisor 🚢</h1>", unsa
 st.subheader("""🌟GPT Powered Tool: advicing business planners, insights to what-if scenarios, allowing more autonomy and may substantially reduce the engineering on-call burden""")
 st.markdown("""Leaveraging on power of Large-Language-Models (LLM) Agents to Act as a wrapper around your Tech Infrastucture E.g complicated Optimization Stuctures and database of your port supply chain""")
 
+
 @contextmanager
 def st_capture():
     with StringIO() as stdout, redirect_stdout(stdout):
