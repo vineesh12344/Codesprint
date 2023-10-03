@@ -63,3 +63,4 @@ class Visualizer:
    @classmethod
    def getWarehouseData(cls) -> pd.DataFrame:
       return warehouse_df
+
