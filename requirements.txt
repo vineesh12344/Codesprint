@@ -1,8 +1,8 @@
+langchain==0.0.292
 openai
 streamlit
 python-dotenv
 gurobipy
-langchain==0.0.292
 FLAML
 OptiGuide
 tiktoken
